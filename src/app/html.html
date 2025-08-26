@@ -1,0 +1,1136 @@
+<!-- ============================================= -->
+<!-- DASHBOARD COMPONENT -->
+<!-- dashboard.component.html -->
+<!-- ============================================= -->
+<div class="dashboard-container">
+  <!-- Header de bienvenida -->
+  <div class="welcome-header">
+    <div class="welcome-content">
+      <h1 class="welcome-title">
+        ¡Bienvenido de vuelta, {{ (user$ | async)?.firstName }}! 👋
+      </h1>
+      <p class="welcome-subtitle">
+        Continúa tu viaje de aprendizaje. Llevas {{ stats.currentStreak }} días consecutivos 
+        <span class="streak-icon">{{ getStreakIcon() }}</span>
+      </p>
+    </div>
+    <div class="header-stats">
+      <div class="stat-card primary">
+        <span class="stat-value">{{ stats.coursesCompleted }}</span>
+        <span class="stat-label">Cursos Completados</span>
+      </div>
+      <div class="stat-card secondary">
+        <span class="stat-value">{{ stats.totalHours }}h</span>
+        <span class="stat-label">Horas de Aprendizaje</span>
+      </div>
+      <div class="stat-card accent">
+        <span class="stat-value">#{{ stats.ranking }}</span>
+        <span class="stat-label">Ranking</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Grid principal -->
+  <div class="dashboard-grid">
+    <!-- Progreso por módulos -->
+    <div class="card progress-card">
+      <div class="card-header">
+        <h2 class="card-title">📊 Progreso por Módulo</h2>
+        <button class="btn-icon">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+        </button>
+      </div>
+      <div class="progress-list">
+        <div *ngFor="let module of progressData" class="progress-item">
+          <div class="progress-info">
+            <span class="module-name">{{ module.module }}</span>
+            <span class="progress-percentage">{{ module.completed }}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" 
+                 [style.width.%]="getProgressPercentage(module.completed, module.total)"
+                 [class.complete]="module.completed === module.total">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cursos recientes -->
+    <div class="card recent-courses-card">
+      <div class="card-header">
+        <h2 class="card-title">📚 Continuar Aprendiendo</h2>
+        <a routerLink="/courses" class="link-all">Ver todos →</a>
+      </div>
+      <div class="courses-grid">
+        <div *ngFor="let course of recentCourses$ | async" 
+             class="course-card-mini"
+             [routerLink]="['/courses', course.id]">
+          <div class="course-thumbnail" 
+               [style.background]="'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'">
+            <span class="course-icon">{{ course.moduleType === 'Frontend' ? '🎨' : 
+                                         course.moduleType === 'Backend' ? '⚙️' : 
+                                         course.moduleType === 'DevOps' ? '🚀' : '☁️' }}</span>
+          </div>
+          <div class="course-info">
+            <h3 class="course-title">{{ course.title }}</h3>
+            <div class="course-meta">
+              <span class="duration">⏱️ {{ course.duration }} min</span>
+              <span class="difficulty" [class]="course.difficulty">
+                {{ course.difficulty }}
+              </span>
+            </div>
+            <div class="course-progress">
+              <div class="progress-bar-mini">
+                <div class="progress-fill" style="width: 45%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insignias recientes -->
+    <div class="card badges-card">
+      <div class="card-header">
+        <h2 class="card-title">🏅 Insignias Recientes</h2>
+        <a routerLink="/badges" class="link-all">Ver todas →</a>
+      </div>
+      <div class="badges-showcase">
+        <div *ngFor="let badge of userBadges$ | async | slice:0:6" 
+             class="badge-item"
+             [title]="badge.description">
+          <div class="badge-icon" [style.background]="badge.color">
+            {{ badge.icon }}
+          </div>
+          <span class="badge-name">{{ badge.name }}</span>
+          <span class="badge-points">+{{ badge.points }} pts</span>
+        </div>
+        <div class="badge-item locked" *ngIf="(userBadges$ | async)?.length < 6">
+          <div class="badge-icon">🔒</div>
+          <span class="badge-name">Bloqueada</span>
+        </div>
+      </div>
+      <div class="total-badges">
+        <strong>{{ stats.totalBadges }}</strong> insignias desbloqueadas
+      </div>
+    </div>
+
+    <!-- Actividad reciente -->
+    <div class="card activity-card">
+      <div class="card-header">
+        <h2 class="card-title">🔔 Actividad Reciente</h2>
+      </div>
+      <div class="activity-timeline">
+        <div class="timeline-item">
+          <div class="timeline-dot success"></div>
+          <div class="timeline-content">
+            <p class="activity-text">Completaste <strong>Angular Avanzado</strong></p>
+            <span class="activity-time">Hace 2 horas</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot badge"></div>
+          <div class="timeline-content">
+            <p class="activity-text">Desbloqueaste la insignia <strong>🚀 DevOps Ninja</strong></p>
+            <span class="activity-time">Ayer</span>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-dot info"></div>
+          <div class="timeline-content">
+            <p class="activity-text">Te inscribiste en <strong>Kubernetes Básico</strong></p>
+            <span class="activity-time">Hace 2 días</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- DASHBOARD COMPONENT STYLES -->
+<!-- dashboard.component.scss -->
+<!-- ============================================= -->
+<style lang="scss">
+.dashboard-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.welcome-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 20px;
+  padding: 2.5rem;
+  color: white;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+
+  .welcome-content {
+    margin-bottom: 2rem;
+
+    .welcome-title {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .welcome-subtitle {
+      font-size: 1.1rem;
+      opacity: 0.95;
+
+      .streak-icon {
+        font-size: 1.3rem;
+        animation: pulse 2s infinite;
+      }
+    }
+  }
+
+  .header-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+
+    .stat-card {
+      background: rgba(255, 255, 255, 0.2);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 1.2rem;
+      text-align: center;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-3px);
+        background: rgba(255, 255, 255, 0.25);
+      }
+
+      .stat-value {
+        display: block;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.3rem;
+      }
+
+      .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.9;
+      }
+    }
+  }
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 1.5rem;
+
+  .card {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+
+      .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #1f2937;
+      }
+
+      .link-all {
+        color: #6366f1;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s;
+
+        &:hover {
+          color: #4f46e5;
+        }
+      }
+
+      .btn-icon {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #6b7280;
+        padding: 0.5rem;
+        border-radius: 8px;
+        transition: all 0.3s;
+
+        &:hover {
+          background: #f3f4f6;
+          color: #4f46e5;
+        }
+
+        .icon {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+  }
+
+  .progress-card {
+    grid-column: span 2;
+
+    .progress-list {
+      .progress-item {
+        margin-bottom: 1.5rem;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .progress-info {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 0.5rem;
+
+          .module-name {
+            font-weight: 500;
+            color: #4b5563;
+          }
+
+          .progress-percentage {
+            font-weight: 600;
+            color: #6366f1;
+          }
+        }
+
+        .progress-bar {
+          height: 10px;
+          background: #e5e7eb;
+          border-radius: 10px;
+          overflow: hidden;
+
+          .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #6366f1, #8b5cf6);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+
+            &.complete {
+              background: linear-gradient(90deg, #10b981, #34d399);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .recent-courses-card {
+    grid-column: span 2;
+
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 1rem;
+
+      .course-card-mini {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+
+        &:hover {
+          background: #f3f4f6;
+          transform: translateX(5px);
+        }
+
+        .course-thumbnail {
+          width: 60px;
+          height: 60px;
+          border-radius: 12px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex-shrink: 0;
+
+          .course-icon {
+            font-size: 1.5rem;
+          }
+        }
+
+        .course-info {
+          flex: 1;
+          min-width: 0;
+
+          .course-title {
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.3rem;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .course-meta {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+
+            .duration {
+              color: #6b7280;
+            }
+
+            .difficulty {
+              padding: 0.1rem 0.4rem;
+              border-radius: 4px;
+              font-size: 0.75rem;
+              font-weight: 500;
+
+              &.beginner {
+                background: #d1fae5;
+                color: #065f46;
+              }
+
+              &.intermediate {
+                background: #fed7aa;
+                color: #92400e;
+              }
+
+              &.advanced {
+                background: #fecaca;
+                color: #991b1b;
+              }
+            }
+          }
+
+          .course-progress {
+            .progress-bar-mini {
+              height: 4px;
+              background: #e5e7eb;
+              border-radius: 4px;
+              overflow: hidden;
+
+              .progress-fill {
+                height: 100%;
+                background: #6366f1;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .badges-card {
+    .badges-showcase {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+
+      .badge-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1rem;
+        background: #f9fafb;
+        border-radius: 12px;
+        transition: all 0.3s;
+        cursor: pointer;
+
+        &:hover:not(.locked) {
+          transform: translateY(-5px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        &.locked {
+          opacity: 0.5;
+          cursor: not-allowed;
+        }
+
+        .badge-icon {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 1.5rem;
+          margin-bottom: 0.5rem;
+          background: #e5e7eb;
+        }
+
+        .badge-name {
+          font-size: 0.85rem;
+          font-weight: 500;
+          color: #4b5563;
+          margin-bottom: 0.2rem;
+        }
+
+        .badge-points {
+          font-size: 0.75rem;
+          color: #10b981;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .total-badges {
+      text-align: center;
+      padding-top: 1rem;
+      border-top: 1px solid #e5e7eb;
+      color: #6b7280;
+    }
+  }
+
+  .activity-card {
+    .activity-timeline {
+      .timeline-item {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+
+        &:not(:last-child)::after {
+          content: '';
+          position: absolute;
+          left: 11px;
+          top: 30px;
+          width: 2px;
+          height: calc(100% + 10px);
+          background: #e5e7eb;
+        }
+
+        .timeline-dot {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          flex-shrink: 0;
+          margin-top: 2px;
+
+          &.success {
+            background: #10b981;
+          }
+
+          &.badge {
+            background: #f59e0b;
+          }
+
+          &.info {
+            background: #3b82f6;
+          }
+        }
+
+        .timeline-content {
+          flex: 1;
+
+          .activity-text {
+            margin-bottom: 0.3rem;
+            color: #374151;
+          }
+
+          .activity-time {
+            font-size: 0.85rem;
+            color: #9ca3af;
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+</style>
+
+<!-- ============================================= -->
+<!-- COURSE LIST COMPONENT -->
+<!-- course-list.component.html -->
+<!-- ============================================= -->
+<div class="courses-container">
+  <!-- Header con filtros -->
+  <div class="courses-header">
+    <div class="header-top">
+      <h1 class="page-title">📚 Catálogo de Cursos</h1>
+      <div class="header-actions">
+        <button class="btn btn-primary" routerLink="/courses/new" *ngIf="currentUser?.role === 'admin' || currentUser?.role === 'instructor'">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Crear Curso
+        </button>
+      </div>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="search-bar">
+      <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+      </svg>
+      <input type="text" 
+             class="search-input" 
+             placeholder="Buscar cursos por título, etiquetas o instructor..."
+             [(ngModel)]="filters.search"
+             (ngModelChange)="onSearchChange($event)">
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-section">
+      <div class="filter-group">
+        <label class="filter-label">Categoría</label>
+        <select class="filter-select" [(ngModel)]="filters.category" (change)="applyFilters()">
+          <option value="">Todas</option>
+          <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Módulo</label>
+        <select class="filter-select" [(ngModel)]="filters.moduleType" (change)="applyFilters()">
+          <option value="">Todos</option>
+          <option *ngFor="let mod of moduleTypes" [value]="mod">{{ mod }}</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Dificultad</label>
+        <select class="filter-select" [(ngModel)]="filters.difficulty" (change)="applyFilters()">
+          <option value="">Todas</option>
+          <option value="beginner">Principiante</option>
+          <option value="intermediate">Intermedio</option>
+          <option value="advanced">Avanzado</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Tipo</label>
+        <select class="filter-select" [(ngModel)]="filters.isInternal" (change)="applyFilters()">
+          <option [ngValue]="null">Todos</option>
+          <option [ngValue]="true">Internos</option>
+          <option [ngValue]="false">Externos</option>
+        </select>
+      </div>
+
+      <button class="btn btn-outline" (click)="clearFilters()">
+        <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        Limpiar
+      </button>
+    </div>
+
+    <!-- Controles de vista -->
+    <div class="view-controls">
+      <div class="sort-control">
+        <label class="control-label">Ordenar por:</label>
+        <select class="sort-select" [(ngModel)]="sortBy" (change)="applyFilters()">
+          <option value="date">Más recientes</option>
+          <option value="title">Título</option>
+          <option value="popularity">Popularidad</option>
+          <option value="difficulty">Dificultad</option>
+        </select>
+      </div>
+
+      <div class="view-toggle">
+        <button class="view-btn" [class.active]="viewMode === 'grid'" (click)="viewMode = 'grid'">
+          <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM13 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2h-2z"/>
+          </svg>
+        </button>
+        <button class="view-btn" [class.active]="viewMode === 'list'" (click)="viewMode = 'list'">
+          <svg class="icon" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Lista de cursos -->
+  <div class="courses-content">
+    <!-- Vista Grid -->
+    <div class="courses-grid" *ngIf="viewMode === 'grid'">
+      <div *ngFor="let course of filteredCourses$ | async" 
+           class="course-card"
+           (click)="navigateToCourse(course.id)">
+        
+        <!-- Thumbnail -->
+        <div class="course-thumbnail">
+          <img *ngIf="course.thumbnailUrl" [src]="course.thumbnailUrl" alt="{{ course.title }}">
+          <div *ngIf="!course.thumbnailUrl" class="thumbnail-placeholder">
+            <span class="module-icon">
+              {{ course.moduleType === 'Frontend' ? '🎨' : 
+                 course.moduleType === 'Backend' ? '⚙️' : 
+                 course.moduleType === 'DevOps' ? '🚀' : 
+                 course.moduleType === 'Cloud' ? '☁️' :
+                 course.moduleType === 'Database' ? '🗄️' :
+                 course.moduleType === 'Security' ? '🔒' :
+                 course.moduleType === 'Mobile' ? '📱' :
+                 course.moduleType === 'AI_ML' ? '🤖' : '📊' }}
+            </span>
+          </div>
+          <span class="course-badge" [class]="course.difficulty">
+            {{ getDifficultyLabel(course.difficulty) }}
+          </span>
+          <span class="course-type" [class.internal]="course.isInternal">
+            {{ course.isInternal ? 'Interno' : 'Externo' }}
+          </span>
+        </div>
+
+        <!-- Contenido -->
+        <div class="course-content">
+          <div class="course-header">
+            <h3 class="course-title">{{ course.title }}</h3>
+            <div class="course-tags">
+              <span *ngFor="let tag of course.tags.slice(0, 3)" class="tag">{{ tag }}</span>
+            </div>
+          </div>
+
+          <p class="course-description">{{ course.description }}</p>
+
+          <div class="course-meta">
+            <div class="meta-item">
+              <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ course.duration }} min</span>
+            </div>
+            <div class="meta-item">
+              <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+              </svg>
+              <span>{{ course.enrolledStudents }} estudiantes</span>
+            </div>
+            <div class="meta-item">
+              <svg class="meta-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{{ course.completionRate }}% completado</span>
+            </div>
+          </div>
+
+          <div class="course-instructor">
+            <img class="instructor-avatar" src="https://i.pravatar.cc/40?img=1" alt="Instructor">
+            <span class="instructor-name">{{ course.instructor }}</span>
+          </div>
+
+          <div class="course-footer">
+            <div class="badge-preview" *ngIf="course.badge">
+              <span class="badge-icon">{{ course.badge.icon }}</span>
+              <span class="badge-points">+{{ course.badge.points }} pts</span>
+            </div>
+            <button class="btn btn-primary btn-sm" (click)="enrollInCourse(course.id, $event)">
+              Inscribirse
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vista Lista -->
+    <div class="courses-list" *ngIf="viewMode === 'list'">
+      <div *ngFor="let course of filteredCourses$ | async" 
+           class="course-list-item"
+           (click)="navigateToCourse(course.id)">
+        
+        <div class="list-thumbnail">
+          <span class="module-icon">
+            {{ course.moduleType === 'Frontend' ? '🎨' : 
+               course.moduleType === 'Backend' ? '⚙️' : 
+               course.moduleType === 'DevOps' ? '🚀' : '☁️' }}
+          </span>
+        </div>
+
+        <div class="list-content">
+          <div class="list-header">
+            <h3 class="list-title">{{ course.title }}</h3>
+            <span class="difficulty-badge" [style.background]="getDifficultyColor(course.difficulty)">
+              {{ getDifficultyLabel(course.difficulty) }}
+            </span>
+          </div>
+          <p class="list-description">{{ course.description }}</p>
+          <div class="list-meta">
+            <span class="meta-item">⏱️ {{ course.duration }} min</span>
+            <span class="meta-item">👥 {{ course.enrolledStudents }} estudiantes</span>
+            <span class="meta-item">📊 {{ course.completionRate }}% completado</span>
+            <span class="meta-item">🏷️ {{ course.category }}</span>
+          </div>
+        </div>
+
+        <div class="list-actions">
+          <div class="badge-info" *ngIf="course.badge">
+            <span>{{ course.badge.icon }}</span>
+            <span>+{{ course.badge.points }} pts</span>
+          </div>
+          <button class="btn btn-primary" (click)="enrollInCourse(course.id, $event)">
+            Inscribirse
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="(filteredCourses$ | async)?.length === 0">
+      <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+      </svg>
+      <h3 class="empty-title">No se encontraron cursos</h3>
+      <p class="empty-text">Intenta ajustar los filtros o buscar con otros términos</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================= -->
+<!-- COURSE DETAIL COMPONENT -->
+<!-- course-detail.component.html -->
+<!-- ============================================= -->
+<div class="course-detail-container" *ngIf="course">
+  <!-- Header del curso -->
+  <div class="course-hero">
+    <div class="hero-background" 
+         [style.background-image]="course.thumbnailUrl ? 'url(' + course.thumbnailUrl + ')' : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'">
+      <div class="hero-overlay"></div>
+    </div>
+    
+    <div class="hero-content">
+      <div class="breadcrumb">
+        <a routerLink="/courses">Cursos</a>
+        <span>/</span>
+        <span>{{ course.category }}</span>
+        <span>/</span>
+        <span>{{ course.title }}</span>
+      </div>
+
+      <h1 class="course-title">{{ course.title }}</h1>
+      
+      <p class="course-description">{{ course.description }}</p>
+
+      <div class="course-meta">
+        <div class="meta-item">
+          <img class="instructor-avatar" src="https://i.pravatar.cc/60?img=1" alt="Instructor">
+          <div>
+            <span class="meta-label">Instructor</span>
+            <span class="meta-value">{{ course.instructor }}</span>
+          </div>
+        </div>
+        <div class="meta-item">
+          <span class="meta-icon">⏱️</span>
+          <div>
+            <span class="meta-label">Duración</span>
+            <span class="meta-value">{{ course.duration }} minutos</span>
+          </div>
+        </div>
+        <div class="meta-item">
+          <span class="meta-icon">📊</span>
+          <div>
+            <span class="meta-label">Nivel</span>
+            <span class="meta-value">{{ getDifficultyLabel(course.difficulty) }}</span>
+          </div>
+        </div>
+        <div class="meta-item">
+          <span class="meta-icon">👥</span>
+          <div>
+            <span class="meta-label">Estudiantes</span>
+            <span class="meta-value">{{ course.enrolledStudents }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-actions">
+        <button *ngIf="!isEnrolled" class="btn btn-primary btn-lg" (click)="enrollInCourse()">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
+          Inscribirse al Curso
+        </button>
+        <button *ngIf="isEnrolled" class="btn btn-success btn-lg" (click)="activeTab = 'content'">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Continuar Aprendiendo
+        </button>
+        <button class="btn btn-outline btn-lg">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a9.001 9.001 0 01-4.874 3.97l-.686-1.372a7.5 7.5 0 001.06-.524m3.5-2.074a7.48 7.48 0 00.917-1.107l1.246.674a9.002 9.002 0 01-1.163 1.33m-.754.903l.754-.903m-.754.903a7.48 7.48 0 01-1.063.706l-.686-1.372c.29-.145.566-.312.826-.499M12 9v3m0 0v3m0-3h3m-3 0H9" />
+          </svg>
+          Compartir
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress Bar (si está inscrito) -->
+  <div class="progress-section" *ngIf="isEnrolled">
+    <div class="progress-info">
+      <span class="progress-label">Tu Progreso</span>
+      <span class="progress-percentage">{{ progress }}%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="progress"></div>
+    </div>
+    <div class="progress-stats">
+      <span>{{ completedChapters.size }} de {{ course.chapters.length }} capítulos completados</span>
+    </div>
+  </div>
+
+  <!-- Tabs de navegación -->
+  <div class="course-tabs">
+    <button class="tab-btn" [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">
+      Información General
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'content'" (click)="activeTab = 'content'">
+      Contenido del Curso
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'materials'" (click)="activeTab = 'materials'">
+      Materiales
+    </button>
+    <button class="tab-btn" [class.active]="activeTab === 'discussion'" (click)="activeTab = 'discussion'">
+      Discusión
+    </button>
+  </div>
+
+  <!-- Contenido de los tabs -->
+  <div class="tab-content">
+    <!-- Tab: Información General -->
+    <div class="tab-pane" *ngIf="activeTab === 'overview'">
+      <div class="overview-grid">
+        <!-- Acerca del curso -->
+        <div class="card">
+          <h2 class="card-title">📖 Acerca de este curso</h2>
+          <p class="card-text">{{ course.description }}</p>
+          
+          <h3 class="section-title">🎯 Objetivos de Aprendizaje</h3>
+          <ul class="objectives-list">
+            <li *ngFor="let objective of course.objectives">
+              <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              {{ objective }}
+            </li>
+          </ul>
+
+          <h3 class="section-title">📋 Prerrequisitos</h3>
+          <div class="prerequisites">
+            <span *ngFor="let prereq of course.prerequisites" class="prereq-tag">
+              {{ prereq }}
+            </span>
+            <span *ngIf="course.prerequisites.length === 0" class="no-prereq">
+              No se requieren conocimientos previos
+            </span>
+          </div>
+        </div>
+
+        <!-- Insignia del curso -->
+        <div class="card badge-card">
+          <h2 class="card-title">🏅 Insignia del Curso</h2>
+          <div class="badge-preview-large">
+            <div class="badge-icon-large" [style.background]="course.badge.color">
+              {{ course.badge.icon }}
+            </div>
+            <h3 class="badge-name">{{ course.badge.name }}</h3>
+            <p class="badge-description">{{ course.badge.description }}</p>
+            <div class="badge-stats">
+              <div class="stat">
+                <span class="stat-value">{{ course.badge.points }}</span>
+                <span class="stat-label">Puntos</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">{{ getRarityLabel(course.badge.rarity) }}</span>
+                <span class="stat-label">Rareza</span>
+              </div>
+            </div>
+          </div>
+          
+          <h3 class="section-title">Requisitos para obtenerla:</h3>
+          <ul class="requirements-list">
+            <li *ngFor="let req of course.badge.requirements">
+              {{ req.description }}
+            </li>
+          </ul>
+        </div>
+
+        <!-- Etiquetas -->
+        <div class="card tags-card">
+          <h2 class="card-title">🏷️ Etiquetas</h2>
+          <div class="tags-cloud">
+            <span *ngFor="let tag of course.tags" class="tag">{{ tag }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Contenido del Curso -->
+    <div class="tab-pane" *ngIf="activeTab === 'content'">
+      <div class="content-layout">
+        <!-- Sidebar de capítulos -->
+        <div class="chapters-sidebar">
+          <h2 class="sidebar-title">Capítulos del Curso</h2>
+          <div class="chapters-list">
+            <div *ngFor="let chapter of course.chapters; let i = index" 
+                 class="chapter-item"
+                 [class.active]="currentChapterIndex === i"
+                 [class.completed]="completedChapters.has(chapter.id)"
+                 (click)="startChapter(i)">
+              <div class="chapter-status">
+                <svg *ngIf="completedChapters.has(chapter.id)" class="status-icon completed" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                <svg *ngIf="currentChapterIndex === i && !completedChapters.has(chapter.id)" class="status-icon playing" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+                </svg>
+                <span *ngIf="!completedChapters.has(chapter.id) && currentChapterIndex !== i" class="status-number">
+                  {{ i + 1 }}
+                </span>
+              </div>
+              <div class="chapter-info">
+                <h4 class="chapter-title">{{ chapter.title }}</h4>
+                <div class="chapter-meta">
+                  <span>{{ chapter.duration }} min</span>
+                  <span *ngIf="chapter.quiz">• Quiz</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contenido del capítulo -->
+        <div class="chapter-content">
+          <div class="video-container" *ngIf="course.chapters[currentChapterIndex]">
+            <div class="video-placeholder">
+              <svg class="play-icon" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+              </svg>
+              <p>Video del Capítulo {{ currentChapterIndex + 1 }}</p>
+            </div>
+          </div>
+
+          <div class="chapter-details">
+            <h2 class="chapter-title">{{ course.chapters[currentChapterIndex]?.title }}</h2>
+            <p class="chapter-description">{{ course.chapters[currentChapterIndex]?.description }}</p>
+
+            <div class="chapter-navigation">
+              <button class="btn btn-outline" 
+                      [disabled]="currentChapterIndex === 0"
+                      (click)="previousChapter()">
+                ← Capítulo Anterior
+              </button>
+              <button class="btn btn-primary"
+                      *ngIf="!completedChapters.has(course.chapters[currentChapterIndex]?.id)"
+                      (click)="completeChapter(course.chapters[currentChapterIndex].id)">
+                Marcar como Completado
+              </button>
+              <button class="btn btn-outline"
+                      [disabled]="currentChapterIndex === course.chapters.length - 1"
+                      (click)="nextChapter()">
+                Siguiente Capítulo →
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Materiales -->
+    <div class="tab-pane" *ngIf="activeTab === 'materials'">
+      <div class="materials-grid">
+        <div *ngFor="let material of course.materials" class="material-card">
+          <div class="material-icon">
+            <svg *ngIf="material.type === 'pdf'" class="file-icon pdf" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-5L9 2H4z" clip-rule="evenodd"/>
+            </svg>
+            <svg *ngIf="material.type === 'video'" class="file-icon video" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"/>
+            </svg>
+            <svg *ngIf="material.type === 'document'" class="file-icon document" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M4 4a2 2 0 00-2 2v8a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-5L9 2H4z" clip-rule="evenodd"/>
+            </svg>
+          </div>
+          <div class="material-info">
+            <h4 class="material-name">{{ material.name }}</h4>
+            <span class="material-size" *ngIf="material.size">
+              {{ (material.size / 1024 / 1024).toFixed(2) }} MB
+            </span>
+          </div>
+          <button class="btn btn-sm btn-outline" (click)="downloadMaterial(material)">
+            <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+            </svg>
+            Descargar
+          </button>
+        </div>
+
+        <div class="empty-materials" *ngIf="course.materials.length === 0">
+          <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+          </svg>
+          <p>No hay materiales disponibles aún</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Discusión -->
+    <div class="tab-pane" *ngIf="activeTab === 'discussion'">
+      <div class="discussion-section">
+        <div class="discussion-header">
+          <h2>💬 Foro de Discusión</h2>
+          <button class="btn btn-primary">Nueva Pregunta</button>
+        </div>
+        
+        <div class="discussion-placeholder">
+          <svg class="discussion-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
+          </svg>
+          <h3>Próximamente</h3>
+          <p>El foro de discusión estará disponible pronto</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

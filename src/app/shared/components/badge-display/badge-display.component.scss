@@ -1,0 +1,299 @@
+.badge-display {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  position: relative;
+  transition: all 0.3s ease;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+
+  .badge-icon {
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  .badge-content {
+    flex: 1;
+    min-width: 0;
+
+    .badge-name {
+      margin: 0 0 0.25rem 0;
+      font-weight: 600;
+      color: #1e293b;
+      line-height: 1.3;
+    }
+
+    .badge-description {
+      margin: 0 0 0.5rem 0;
+      color: #64748b;
+      line-height: 1.4;
+    }
+
+    .badge-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.85rem;
+
+      .badge-points,
+      .badge-date {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        color: #64748b;
+      }
+
+      .badge-rarity {
+        .rarity-label {
+          padding: 0.2rem 0.5rem;
+          border-radius: 6px;
+          font-size: 0.75rem;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+
+  .badge-glow {
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.5) 50%, transparent 70%);
+    animation: shimmer 2s infinite;
+    pointer-events: none;
+  }
+
+  .new-badge-indicator {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.15rem 0.4rem;
+    border-radius: 10px;
+    animation: pulse 2s infinite;
+    z-index: 3;
+  }
+
+  // Tamaños
+  &.small {
+    gap: 0.5rem;
+
+    .badge-icon {
+      width: 32px;
+      height: 32px;
+      font-size: 1rem;
+    }
+
+    .badge-content {
+      .badge-name {
+        font-size: 0.9rem;
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  &.medium {
+    gap: 0.75rem;
+
+    .badge-icon {
+      width: 48px;
+      height: 48px;
+      font-size: 1.3rem;
+    }
+
+    .badge-content {
+      .badge-name {
+        font-size: 1rem;
+      }
+
+      .badge-description {
+        font-size: 0.85rem;
+      }
+    }
+  }
+
+  &.large {
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    .badge-icon {
+      width: 64px;
+      height: 64px;
+      font-size: 1.8rem;
+    }
+
+    .badge-content {
+      .badge-name {
+        font-size: 1.25rem;
+      }
+
+      .badge-description {
+        font-size: 0.9rem;
+      }
+    }
+  }
+
+  // Estilos de rareza
+  &.rarity-common {
+    .badge-content .badge-meta .badge-rarity .rarity-label {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+  }
+
+  &.rarity-rare {
+    .badge-content .badge-meta .badge-rarity .rarity-label {
+      background: #dbeafe;
+      color: #1d4ed8;
+    }
+
+    .badge-icon {
+      box-shadow: 0 0 15px rgba(29, 78, 216, 0.3);
+    }
+  }
+
+  &.rarity-epic {
+    .badge-content .badge-meta .badge-rarity .rarity-label {
+      background: #ede9fe;
+      color: #7c3aed;
+    }
+
+    .badge-icon {
+      box-shadow: 0 0 20px rgba(124, 58, 237, 0.4);
+    }
+  }
+
+  &.rarity-legendary {
+    .badge-content .badge-meta .badge-rarity .rarity-label {
+      background: #fef3c7;
+      color: #d97706;
+    }
+
+    .badge-icon {
+      box-shadow: 0 0 25px rgba(217, 119, 6, 0.5);
+    }
+
+    .badge-glow {
+      background: linear-gradient(45deg, 
+        rgba(217, 119, 6, 0.2) 0%, 
+        rgba(245, 158, 11, 0.3) 25%,
+        rgba(255, 255, 255, 0.4) 50%,
+        rgba(245, 158, 11, 0.3) 75%,
+        rgba(217, 119, 6, 0.2) 100%);
+    }
+  }
+}
+
+// Animaciones
+@keyframes shimmer {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+// Layout horizontal para listas
+.badge-list-horizontal {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  .badge-display {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+
+    .badge-content {
+      .badge-name {
+        font-size: 0.85rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .badge-description {
+        display: none;
+      }
+
+      .badge-meta {
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: center;
+      }
+    }
+  }
+}
+
+// Grid layout para galerías
+.badge-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 1rem;
+
+  .badge-display {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      border-color: #cbd5e1;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .badge-content {
+      .badge-name {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+      }
+
+      .badge-description {
+        font-size: 0.75rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .badge-meta {
+        flex-direction: column;
+        gap: 0.25rem;
+        align-items: center;
+        font-size: 0.75rem;
+      }
+    }
+  }
+}

@@ -1,0 +1,96 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+  <div class="sidebar-header">
+    <div class="sidebar-logo" *ngIf="!collapsed">
+      <span class="logo-icon">🎓</span>
+      <span class="logo-text">Training</span>
+    </div>
+    <button class="toggle-btn" (click)="toggleSidebar()">
+      <svg *ngIf="!collapsed" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      <svg *ngIf="collapsed" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav" *ngIf="currentUser$ | async as user">
+    <div class="nav-section">
+      <h3 class="section-title" *ngIf="!collapsed">General</h3>
+      <ul class="nav-list">
+        <li *ngFor="let item of menuItems; trackBy: trackByRoute" 
+            class="nav-item" 
+            [hidden]="!hasAccess(item.roles, user.role)">
+          <a [routerLink]="item.route" 
+             routerLinkActive="active"
+             class="nav-link"
+             [title]="collapsed ? item.label : ''"
+             (click)="navigateTo(item.route)">
+            <span class="nav-icon">{{ item.icon }}</span>
+            <span class="nav-label" *ngIf="!collapsed">{{ item.label }}</span>
+            <span class="nav-indicator" *ngIf="isActiveRoute(item.route)"></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Sección de estadísticas rápidas (solo cuando no está colapsado) -->
+    <div class="stats-section" *ngIf="!collapsed">
+      <h3 class="section-title">Estadísticas Rápidas</h3>
+      <div class="quick-stats">
+        <div class="stat-item">
+          <span class="stat-icon">📚</span>
+          <div class="stat-info">
+            <span class="stat-value">{{ user.enrolledCourses?.length || 0 }}</span>
+            <span class="stat-label">Cursos Activos</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">✅</span>
+          <div class="stat-info">
+            <span class="stat-value">{{ user.completedCourses?.length || 0 }}</span>
+            <span class="stat-label">Completados</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon">🏅</span>
+          <div class="stat-info">
+            <span class="stat-value">{{ user.badges?.length || 0 }}</span>
+            <span class="stat-label">Insignias</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progreso del usuario (solo para estudiantes y cuando no está colapsado) -->
+    <div class="progress-section" *ngIf="!collapsed && user.role === 'student'">
+      <h3 class="section-title">Mi Progreso</h3>
+      <div class="progress-card">
+        <div class="progress-info">
+          <span class="progress-label">Nivel de Aprendizaje</span>
+          <span class="progress-level">Intermedio</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: 65%"></div>
+        </div>
+        <div class="progress-stats">
+          <span>65% completado</span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="sidebar-footer" *ngIf="!collapsed">
+    <div class="footer-content">
+      <div class="help-section">
+        <button class="help-btn" routerLink="/help">
+          <span class="help-icon">❓</span>
+          <span>¿Necesitas ayuda?</span>
+        </button>
+      </div>
+      <div class="version-info">
+        <span>v1.0.0</span>
+      </div>
+    </div>
+  </div>
+</aside>
