@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
-import { User, LoginRequest, LoginResponse } from '../models';
+import { User, LoginRequest, LoginResponse, RegisterRequest, UserRole } from '../models';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -49,7 +49,17 @@ export class AuthService {
     return !!this.currentUserValue && !!localStorage.getItem('token');
   }
 
-  hasRole(role: string): boolean {
+  register(registerData: RegisterRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${this.apiUrl}/register`, registerData).pipe(
+      tap(response => {
+        localStorage.setItem('currentUser', JSON.stringify(response.user));
+        localStorage.setItem('token', response.token);
+        this.currentUserSubject.next(response.user);
+      })
+    );
+  }
+
+  hasRole(role: UserRole): boolean {
     return this.currentUserValue?.role === role;
   }
 

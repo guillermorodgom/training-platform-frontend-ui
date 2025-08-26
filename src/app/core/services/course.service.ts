@@ -35,7 +35,7 @@ export class CourseService {
     return this.http.get<Course[]>(`${this.apiUrl}/cursos`, { params });
   }
 
-  getCourseById(id: string): Observable<Course> {
+  getCourseById(id: number): Observable<Course> {
     return this.http.get<Course>(`${this.apiUrl}/cursos/${id}`);
   }
 
@@ -45,49 +45,59 @@ export class CourseService {
     );
   }
 
-  updateCourse(id: string, updates: Partial<Course>): Observable<Course> {
+  updateCourse(id: number, updates: Partial<Course>): Observable<Course> {
     return this.http.put<Course>(`${this.apiUrl}/cursos/${id}`, updates).pipe(
       tap(() => this.loadCourses())
     );
   }
 
-  deleteCourse(id: string): Observable<void> {
+  deleteCourse(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/cursos/${id}`).pipe(
       tap(() => this.loadCourses())
     );
   }
 
-  enrollInCourse(courseId: string, userId: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/cursos/${courseId}/enroll`, { userId });
+  enrollInCourse(courseId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/cursos/${courseId}/enrollar`, {});
   }
 
-  completeCourse(courseId: string, userId: string): Observable<Badge> {
-    return this.http.post<Badge>(`${this.apiUrl}/cursos/${courseId}/complete`, { userId });
+  completeCourse(courseId: number): Observable<Badge> {
+    return this.http.post<Badge>(`${this.apiUrl}/cursos/${courseId}/completar`, {});
   }
 
-  getEnrolledCourses(userId: string): Observable<Course[]> {
-    return this.http.get<Course[]>(`${this.apiUrl}/users/${userId}/cursos`);
+  getEnrolledCourses(): Observable<Course[]> {
+    return this.http.get<Course[]>(`${this.apiUrl}/progreso/mis-cursos`);
   }
 
-  getCourseProgress(courseId: string, userId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/cursos/${courseId}/progress/${userId}`);
+  getCourseProgress(courseId: number): Observable<any> {
+    return this.http.get(`${this.apiUrl}/progreso/curso/${courseId}`);
   }
 
-  updateCourseProgress(courseId: string, userId: string, progress: any): Observable<any> {
-    return this.http.put(`${this.apiUrl}/cursos/${courseId}/progress/${userId}`, progress);
+  updateCourseProgress(courseId: number, progress: any): Observable<any> {
+    return this.http.put(`${this.apiUrl}/progreso/curso/${courseId}`, progress);
   }
 
-  uploadCourseMaterial(courseId: string, file: File): Observable<CourseMaterial> {
+  uploadCourseMaterial(courseId: number, file: File): Observable<CourseMaterial> {
     const formData = new FormData();
     formData.append('file', file);
-    return this.http.post<CourseMaterial>(`${this.apiUrl}/cursos/${courseId}/materials`, formData);
+    return this.http.post<CourseMaterial>(`${this.apiUrl}/contenidos`, formData);
   }
 
-  getCourseMaterials(courseId: string): Observable<CourseMaterial[]> {
-    return this.http.get<CourseMaterial[]>(`${this.apiUrl}/cursos/${courseId}/materials`);
+  getCourseMaterials(courseId: number): Observable<CourseMaterial[]> {
+    return this.http.get<CourseMaterial[]>(`${this.apiUrl}/contenidos/curso/${courseId}`);
   }
 
-  submitQuiz(courseId: string, chapterId: string, answers: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/cursos/${courseId}/chapters/${chapterId}/quiz`, answers);
+  submitQuiz(courseId: number, chapterId: number, answers: any): Observable<any> {
+    return this.http.post(`${this.apiUrl}/cursos/${courseId}/capitulos/${chapterId}/quiz`, answers);
+  }
+  
+  getCoursesByCategory(categoria: string): Observable<Course[]> {
+    const params = new HttpParams().set('categoria', categoria);
+    return this.http.get<Course[]>(`${this.apiUrl}/cursos/categoria`, { params });
+  }
+
+  getCoursesByLevel(nivel: string): Observable<Course[]> {
+    const params = new HttpParams().set('nivel', nivel);
+    return this.http.get<Course[]>(`${this.apiUrl}/cursos/nivel`, { params });
   }
 }

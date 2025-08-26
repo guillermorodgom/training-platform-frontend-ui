@@ -29,7 +29,7 @@
   </div>
   
   <!-- Efecto de brillo para badges épicos y legendarios -->
-  <div class="badge-glow" *ngIf="badge.rarity === 'epic' || badge.rarity === 'legendary'"></div>
+  <div class="badge-glow" *ngIf="badge.rarity === BadgeRarity.EPIC || badge.rarity === BadgeRarity.LEGENDARY"></div>
   
   <!-- Indicador de nuevo si se acaba de ganar -->
   <div class="new-badge-indicator" *ngIf="badge.earnedDate && isRecentlyEarned()">

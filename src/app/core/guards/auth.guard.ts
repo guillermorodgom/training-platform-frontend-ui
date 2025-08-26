@@ -26,24 +26,31 @@ export class AuthGuard implements CanActivate, CanLoad {
   }
 
   private checkAuth(route?: ActivatedRouteSnapshot): Observable<boolean> {
-    return this.authService.currentUser$.pipe(
-      take(1),
-      map(user => {
-        if (user && this.authService.isAuthenticated()) {
-          // Check role-based access if required
-          if (route?.data?.['role']) {
-            const requiredRole = route.data['role'];
-            if (user.role !== requiredRole) {
-              this.router.navigate(['/dashboard']);
-              return false;
-            }
-          }
-          return true;
-        } else {
-          this.router.navigate(['/auth/login']);
-          return false;
-        }
-      })
-    );
+    // COMENTADO: Autenticación deshabilitada temporalmente para desarrollo
+    // return this.authService.currentUser$.pipe(
+    //   take(1),
+    //   map(user => {
+    //     if (user && this.authService.isAuthenticated()) {
+    //       // Check role-based access if required
+    //       if (route?.data?.['role']) {
+    //         const requiredRole = route.data['role'];
+    //         if (user.role !== requiredRole) {
+    //           this.router.navigate(['/dashboard']);
+    //           return false;
+    //         }
+    //       }
+    //       return true;
+    //     } else {
+    //       this.router.navigate(['/auth/login']);
+    //       return false;
+    //     }
+    //   })
+    // );
+    
+    // Permitir acceso a todas las rutas sin autenticación (solo para desarrollo)
+    return new Observable(observer => {
+      observer.next(true);
+      observer.complete();
+    });
   }
 }

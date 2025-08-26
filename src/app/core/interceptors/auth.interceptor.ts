@@ -14,33 +14,44 @@ export class AuthInterceptor implements HttpInterceptor {
   ) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    // COMENTADO: Token JWT deshabilitado temporalmente para desarrollo
     // Add authentication token if available
-    const token = this.authService.getToken();
-    if (token && !request.url.includes('/auth/login')) {
-      request = request.clone({
-        setHeaders: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-    }
+    // const token = this.authService.getToken();
+    // if (token && !request.url.includes('/auth/login')) {
+    //   request = request.clone({
+    //     setHeaders: {
+    //       'Authorization': `Bearer ${token}`,
+    //       'Content-Type': 'application/json'
+    //     }
+    //   });
+    // }
+    
+    // Solo agregar Content-Type sin autenticación (desarrollo)
+    request = request.clone({
+      setHeaders: {
+        'Content-Type': 'application/json'
+      }
+    });
 
     return next.handle(request).pipe(
       catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
-          // Unauthorized - redirect to login
-          this.authService.logout();
-          this.notificationService.showError(
-            'Sesión Expirada',
-            'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'
-          );
-        } else if (error.status === 403) {
-          // Forbidden
-          this.notificationService.showError(
-            'Acceso Denegado',
-            'No tienes permisos para realizar esta acción.'
-          );
-        } else if (error.status >= 500) {
+        // COMENTADO: Manejo de errores de autenticación deshabilitado para desarrollo
+        // if (error.status === 401) {
+        //   // Unauthorized - redirect to login
+        //   this.authService.logout();
+        //   this.notificationService.showError(
+        //     'Sesión Expirada',
+        //     'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'
+        //   );
+        // } else if (error.status === 403) {
+        //   // Forbidden
+        //   this.notificationService.showError(
+        //     'Acceso Denegado',
+        //     'No tienes permisos para realizar esta acción.'
+        //   );
+        // } else 
+        
+        if (error.status >= 500) {
           // Server error
           this.notificationService.showError(
             'Error del Servidor',

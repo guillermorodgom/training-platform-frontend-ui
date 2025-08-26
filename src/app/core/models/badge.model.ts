@@ -1,15 +1,15 @@
 export interface Badge {
-  id: string;
+  id: number;
   name: string;
   description: string;
   icon: string;
   color: string;
   category: BadgeCategory;
-  requirements: BadgeRequirement[];
-  earnedDate?: Date;
-  courseId?: string;
-  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+  rarity: BadgeRarity;
   points: number;
+  courseId?: number;
+  requirements?: string;
+  earnedDate?: Date;
 }
 
 export interface BadgeRequirement {
@@ -19,9 +19,16 @@ export interface BadgeRequirement {
 }
 
 export enum BadgeCategory {
-  COMPLETION = 'Completación',
-  EXCELLENCE = 'Excelencia',
-  SPEED = 'Velocidad',
-  CONSISTENCY = 'Consistencia',
-  MILESTONE = 'Hito'
+  COMPLETION = 'COMPLETION',
+  EXCELLENCE = 'EXCELLENCE',
+  SPEED = 'SPEED',
+  CONSISTENCY = 'CONSISTENCY',
+  MILESTONE = 'MILESTONE'
+}
+
+export enum BadgeRarity {
+  COMMON = 'COMMON',
+  RARE = 'RARE',
+  EPIC = 'EPIC',
+  LEGENDARY = 'LEGENDARY'
 }

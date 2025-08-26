@@ -2,7 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { Observable } from 'rxjs';
-import { User } from '../../../core/models';
+import { User, UserRole } from '../../../core/models';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,61 +12,62 @@ import { User } from '../../../core/models';
 export class SidebarComponent implements OnInit {
   @Input() collapsed = false;
   currentUser$: Observable<User | null>;
+  UserRole = UserRole; // Exponer enum al template
   
   menuItems = [
     {
       label: 'Dashboard',
       icon: '📊',
       route: '/dashboard',
-      roles: ['admin', 'instructor', 'student']
+      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT]
     },
     {
       label: 'Cursos',
       icon: '📚',
       route: '/courses',
-      roles: ['admin', 'instructor', 'student']
+      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT]
     },
     {
       label: 'Mis Cursos',
       icon: '🎓',
       route: '/my-courses',
-      roles: ['student']
+      roles: [UserRole.STUDENT]
     },
     {
       label: 'Crear Curso',
       icon: '➕',
       route: '/courses/new',
-      roles: ['admin', 'instructor']
+      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR]
     },
     {
       label: 'Insignias',
       icon: '🏅',
       route: '/badges',
-      roles: ['admin', 'instructor', 'student']
+      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT]
     },
     {
       label: 'Mi Perfil',
       icon: '👤',
       route: '/profile',
-      roles: ['admin', 'instructor', 'student']
+      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT]
     },
     {
       label: 'Usuarios',
       icon: '👥',
       route: '/admin/users',
-      roles: ['admin']
+      roles: [UserRole.ADMIN]
     },
     {
       label: 'Reportes',
       icon: '📈',
       route: '/admin/reports',
-      roles: ['admin']
+      roles: [UserRole.ADMIN]
     },
     {
       label: 'Configuración',
       icon: '⚙️',
       route: '/settings',
-      roles: ['admin', 'instructor', 'student']
+      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT]
     }
   ];
 
@@ -83,7 +84,7 @@ export class SidebarComponent implements OnInit {
     this.router.navigate([route]);
   }
 
-  hasAccess(roles: string[], userRole?: string): boolean {
+  hasAccess(roles: UserRole[], userRole?: UserRole): boolean {
     return userRole ? roles.includes(userRole) : false;
   }
 

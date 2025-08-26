@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { Badge } from '../../../core/models';
+import { Badge, BadgeRarity } from '../../../core/models';
 
 @Component({
   selector: 'app-badge-display',
@@ -12,21 +12,23 @@ export class BadgeDisplayComponent implements OnInit {
   @Input() showDetails = true;
   @Input() clickable = false;
 
+  BadgeRarity = BadgeRarity; // Exponer enum al template
+
   constructor() { }
 
   ngOnInit(): void {
   }
 
   getRarityClass(): string {
-    return `rarity-${this.badge?.rarity || 'common'}`;
+    return `rarity-${this.badge?.rarity?.toLowerCase() || 'common'}`;
   }
 
-  getRarityLabel(rarity: string): string {
-    const labels: { [key: string]: string } = {
-      'common': 'Común',
-      'rare': 'Raro',
-      'epic': 'Épico',
-      'legendary': 'Legendario'
+  getRarityLabel(rarity: BadgeRarity): string {
+    const labels: { [key in BadgeRarity]: string } = {
+      [BadgeRarity.COMMON]: 'Común',
+      [BadgeRarity.RARE]: 'Raro',
+      [BadgeRarity.EPIC]: 'Épico',
+      [BadgeRarity.LEGENDARY]: 'Legendario'
     };
     return labels[rarity] || rarity;
   }

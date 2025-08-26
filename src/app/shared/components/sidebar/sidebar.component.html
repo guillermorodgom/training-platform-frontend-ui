@@ -63,7 +63,7 @@
     </div>
 
     <!-- Progreso del usuario (solo para estudiantes y cuando no está colapsado) -->
-    <div class="progress-section" *ngIf="!collapsed && user.role === 'student'">
+    <div class="progress-section" *ngIf="!collapsed && user.role === UserRole.STUDENT">
       <h3 class="section-title">Mi Progreso</h3>
       <div class="progress-card">
         <div class="progress-info">

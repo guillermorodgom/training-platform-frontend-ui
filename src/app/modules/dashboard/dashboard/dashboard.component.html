@@ -57,15 +57,15 @@
       <div class="courses-grid">
         <div *ngFor="let course of recentCourses$ | async" 
              class="course-card-mini"
-             [routerLink]="['/courses', course.id]">
+             [routerLink]="['/courses', course.idCurso]">
           <div class="course-thumbnail">
             <span class="course-icon">📚</span>
           </div>
           <div class="course-info">
-            <h3 class="course-title">{{ course.title }}</h3>
+            <h3 class="course-title">{{ course.titulo }}</h3>
             <div class="course-meta">
-              <span class="duration">⏱️ {{ course.duration }} min</span>
-              <span class="difficulty">{{ course.difficulty }}</span>
+              <span class="duration">⏱️ {{ course.duration || 'N/A' }} min</span>
+              <span class="difficulty">{{ course.difficulty || course.nivel }}</span>
             </div>
             <div class="course-progress">
               <div class="progress-bar-mini">

@@ -9,57 +9,65 @@ import { environment } from '../../../environments/environment';
   providedIn: 'root'
 })
 export class BadgeService {
-  private apiUrl = `${environment.apiUrl}`;
+  private apiUrl = `${environment.apiUrl}/badges`;
   private userBadgesSubject = new BehaviorSubject<Badge[]>([]);
   public userBadges$ = this.userBadgesSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
-  getUserBadges(userId?: string): Observable<Badge[]> {
-    const url = userId ? `${this.apiUrl}/users/${userId}/badges` : `${this.apiUrl}/user/badges`;
-    return this.http.get<Badge[]>(url).pipe(
+  getUserBadges(): Observable<Badge[]> {
+    return this.http.get<Badge[]>(`${this.apiUrl}/usuario`).pipe(
       tap(badges => this.userBadgesSubject.next(badges))
     );
   }
 
   getAllBadges(): Observable<Badge[]> {
-    return this.http.get<Badge[]>(`${this.apiUrl}/badges`);
+    return this.http.get<Badge[]>(this.apiUrl);
   }
 
-  getBadgeById(id: string): Observable<Badge> {
-    return this.http.get<Badge>(`${this.apiUrl}/badges/${id}`);
+  getBadgeById(id: number): Observable<Badge> {
+    return this.http.get<Badge>(`${this.apiUrl}/${id}`);
   }
 
-  awardBadge(badgeId: string, userId: string): Observable<Badge> {
-    return this.http.post<Badge>(`${this.apiUrl}/badges/${badgeId}/award`, { userId }).pipe(
-      tap(badge => {
-        const currentBadges = this.userBadgesSubject.value;
-        this.userBadgesSubject.next([...currentBadges, badge]);
-      })
+  awardBadge(badgeId: number): Observable<Badge> {
+    return this.http.post<Badge>(`${this.apiUrl}/otorgar/${badgeId}`, {}).pipe(
+      tap(() => this.refreshUserBadges())
     );
   }
 
-  checkBadgeProgress(userId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${userId}/badge-progress`);
+  getAvailableBadges(): Observable<Badge[]> {
+    return this.http.get<Badge[]>(`${this.apiUrl}/disponibles`);
+  }
+
+  private refreshUserBadges(): void {
+    this.getUserBadges().subscribe();
   }
 
   getBadgesByCategory(category: string): Observable<Badge[]> {
-    return this.http.get<Badge[]>(`${this.apiUrl}/badges/category/${category}`);
+    return this.http.get<Badge[]>(`${this.apiUrl}?category=${category}`);
   }
 
-  createBadge(badge: Partial<Badge>): Observable<Badge> {
-    return this.http.post<Badge>(`${this.apiUrl}/badges`, badge);
+  getBadgesByRarity(rarity: string): Observable<Badge[]> {
+    return this.http.get<Badge[]>(`${this.apiUrl}?rarity=${rarity}`);
   }
 
-  updateBadge(id: string, updates: Partial<Badge>): Observable<Badge> {
-    return this.http.put<Badge>(`${this.apiUrl}/badges/${id}`, updates);
+  getUserTotalPoints(): Observable<number> {
+    return new Observable(observer => {
+      this.getUserBadges().subscribe(badges => {
+        const totalPoints = badges.reduce((sum, badge) => sum + (badge.points || 0), 0);
+        observer.next(totalPoints);
+        observer.complete();
+      });
+    });
   }
 
-  deleteBadge(id: string): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/badges/${id}`);
-  }
-
-  getUserStats(userId: string): Observable<any> {
-    return this.http.get(`${this.apiUrl}/users/${userId}/badge-stats`);
+  hasEarnedBadge(badgeId: number): Observable<boolean> {
+    return new Observable(observer => {
+      this.userBadges$.subscribe(badges => {
+        const hasBadge = badges.some(badge => badge.id === badgeId);
+        observer.next(hasBadge);
+        observer.complete();
+      });
+    });
   }
 }

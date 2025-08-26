@@ -40,8 +40,9 @@ const routes: Routes = [
     path: 'admin',
     loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule),
     canLoad: [AuthGuard],
-    canActivate: [AuthGuard],
-    data: { role: 'admin' }
+    canActivate: [AuthGuard]
+    // COMENTADO: Validación de roles deshabilitada para desarrollo
+    // data: { role: 'admin' }
   },
   {
     path: '**',
