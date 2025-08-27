@@ -20,7 +20,7 @@
       <ul class="nav-list">
         <li *ngFor="let item of menuItems; trackBy: trackByRoute" 
             class="nav-item" 
-            [hidden]="!hasAccess(item.roles, user.role)">
+            [hidden]="!hasAccess(item.roles, user.rol)">
           <a [routerLink]="item.route" 
              routerLinkActive="active"
              class="nav-link"
@@ -41,21 +41,21 @@
         <div class="stat-item">
           <span class="stat-icon">📚</span>
           <div class="stat-info">
-            <span class="stat-value">{{ user.enrolledCourses?.length || 0 }}</span>
+            <span class="stat-value">0</span>
             <span class="stat-label">Cursos Activos</span>
           </div>
         </div>
         <div class="stat-item">
           <span class="stat-icon">✅</span>
           <div class="stat-info">
-            <span class="stat-value">{{ user.completedCourses?.length || 0 }}</span>
+            <span class="stat-value">0</span>
             <span class="stat-label">Completados</span>
           </div>
         </div>
         <div class="stat-item">
           <span class="stat-icon">🏅</span>
           <div class="stat-info">
-            <span class="stat-value">{{ user.badges?.length || 0 }}</span>
+            <span class="stat-value">0</span>
             <span class="stat-label">Insignias</span>
           </div>
         </div>
@@ -63,7 +63,7 @@
     </div>
 
     <!-- Progreso del usuario (solo para estudiantes y cuando no está colapsado) -->
-    <div class="progress-section" *ngIf="!collapsed && user.role === UserRole.STUDENT">
+    <div class="progress-section" *ngIf="!collapsed && user.rol === UserRole.ESTUDIANTE">
       <h3 class="section-title">Mi Progreso</h3>
       <div class="progress-card">
         <div class="progress-info">

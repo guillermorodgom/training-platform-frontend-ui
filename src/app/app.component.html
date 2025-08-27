@@ -1,12 +1,12 @@
 <div class="app-layout">
-  <!-- Header -->
-  <app-header></app-header>
-
-  <!-- Sidebar -->
-  <app-sidebar></app-sidebar>
+  <!-- Header y Sidebar solo para usuarios autenticados -->
+  <ng-container *ngIf="isAuthenticated">
+    <app-header></app-header>
+    <app-sidebar></app-sidebar>
+  </ng-container>
 
   <!-- Main Content -->
-  <main class="main-content">
+  <main class="main-content" [class.auth-layout]="!isAuthenticated">
     <router-outlet></router-outlet>
   </main>
 </div>

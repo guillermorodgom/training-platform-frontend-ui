@@ -1,19 +1,24 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { Course, CourseMaterial, Badge } from '../models';
+import { HttpClient, HttpParams, HttpHeaders } from '@angular/common/http';
+import { Observable, BehaviorSubject, throwError } from 'rxjs';
+import { tap, map, catchError } from 'rxjs/operators';
+import { Course, CourseMaterial, Badge, UserChapter, UserChaptersResponse } from '../models';
 import { environment } from '../../../environments/environment';
+import { AuthService } from './auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CourseService {
   private apiUrl = `${environment.apiUrl}`;
+  private userCoursesApiUrl = 'http://localhost:8081/api'; // URL específica para cursos de usuario
   private coursesSubject = new BehaviorSubject<Course[]>([]);
   public courses$ = this.coursesSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService
+  ) {
     this.loadCourses();
   }
 
@@ -99,5 +104,62 @@ export class CourseService {
   getCoursesByLevel(nivel: string): Observable<Course[]> {
     const params = new HttpParams().set('nivel', nivel);
     return this.http.get<Course[]>(`${this.apiUrl}/cursos/nivel`, { params });
+  }
+
+  /**
+   * Obtiene los capítulos con cursos del usuario actual
+   * @param userId - ID del usuario
+   * @returns Observable con los capítulos y cursos del usuario
+   */
+  getUserChaptersWithCourses(userId: number): Observable<UserChapter[]> {
+    console.log('CourseService: Getting user chapters for userId:', userId);
+    
+    // Obtener el token de autenticación
+    const token = this.authService.getToken();
+    
+    if (!token) {
+      console.error('CourseService: No authentication token found');
+      throw new Error('No hay token de autenticación');
+    }
+
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    });
+
+    const url = `${this.userCoursesApiUrl}/usuario-cursos/usuario/${userId}/capitulos`;
+    console.log('CourseService: Making request to:', url);
+
+    return this.http.get<UserChaptersResponse>(url, { headers })
+      .pipe(
+        map(response => {
+          console.log('CourseService: Raw response:', response);
+          
+          // La respuesta ya viene en el formato correcto según el ejemplo
+          const chapters = Array.isArray(response) ? response : [];
+          
+          console.log('CourseService: Processed chapters:', chapters);
+          return chapters;
+        }),
+        catchError(error => {
+          console.error('CourseService: Error getting user chapters:', error);
+          throw error;
+        })
+      );
+  }
+
+  /**
+   * Obtiene los cursos del usuario actual (método de conveniencia)
+   * Nota: Necesitamos el ID del usuario del localStorage o del token JWT
+   */
+  getCurrentUserChaptersWithCourses(): Observable<UserChapter[]> {
+    const currentUser = this.authService.currentUserValue;
+    
+    if (!currentUser || !currentUser.id_usuario) {
+      console.error('CourseService: No current user found');
+      throw new Error('Usuario no autenticado');
+    }
+
+    return this.getUserChaptersWithCourses(currentUser.id_usuario);
   }
 }

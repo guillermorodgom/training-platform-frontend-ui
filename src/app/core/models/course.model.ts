@@ -85,3 +85,27 @@ export enum ModuleType {
   AI_ML = 'IA/ML',
   PROJECT_MANAGEMENT = 'Gestión de Proyectos'
 }
+
+// Interface para los capítulos con cursos del usuario (Mis Cursos)
+export interface UserChapter {
+  idCapitulo: number;
+  titulo: string;
+  contenidoUrl: string;
+  orden: number;
+  fechaCreacion: string;
+  cursos: UserCourse[];
+}
+
+// Interface para los cursos del usuario simplificada
+export interface UserCourse {
+  idCurso: number;
+  titulo: string;
+  descripcion: string | null;
+  categoria: string;
+  nivel: string;
+  estado: string | null;
+  fechaCreacion: string | null;
+}
+
+// Type para la respuesta del endpoint de cursos del usuario
+export type UserChaptersResponse = UserChapter[];

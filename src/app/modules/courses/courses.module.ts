@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 
 import { CoursesRoutingModule } from './courses-routing.module';
 import { CoursesComponent } from './courses/courses.component';
+import { MyCoursesComponent } from './my-courses/my-courses.component';
 
 
 @NgModule({
   declarations: [
-    CoursesComponent
+    CoursesComponent,
+    MyCoursesComponent
   ],
   imports: [
     CommonModule,

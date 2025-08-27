@@ -1,0 +1,125 @@
+<div class="my-courses-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-content">
+      <h1 class="page-title">📚 Mis Cursos</h1>
+      <p class="page-subtitle">Aquí puedes ver todos los capítulos y cursos que tienes asignados</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-refresh" (click)="onRefresh()" [disabled]="isLoading">
+        <span class="btn-icon">🔄</span>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="isLoading">
+    <div class="loading-spinner"></div>
+    <p class="loading-text">Cargando tus cursos...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="errorMessage && !isLoading">
+    <div class="error-icon">⚠️</div>
+    <h3 class="error-title">Oops! Algo salió mal</h3>
+    <p class="error-message">{{ errorMessage }}</p>
+    <button class="btn-retry" (click)="onRefresh()">
+      Intentar nuevamente
+    </button>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!isLoading && !errorMessage && userChapters.length > 0">
+    <!-- Capítulos -->
+    <div class="chapters-grid">
+      <div class="chapter-card" *ngFor="let chapter of userChapters; trackBy: trackByChapter">
+        <div class="chapter-header">
+          <div class="chapter-info">
+            <h2 class="chapter-title">{{ chapter.titulo }}</h2>
+            <div class="chapter-meta">
+              <span class="chapter-order">Capítulo {{ chapter.orden }}</span>
+              <span class="chapter-date">{{ getChapterDate(chapter.fechaCreacion) }}</span>
+            </div>
+          </div>
+          <div class="chapter-actions">
+            <button class="btn-view-content" (click)="onViewChapter(chapter)" title="Ver contenido del capítulo">
+              <span class="btn-icon">👁️</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Cursos del Capítulo -->
+        <div class="courses-section">
+          <h3 class="courses-title">
+            Cursos en este capítulo ({{ chapter.cursos.length }})
+          </h3>
+          
+          <div class="courses-grid" *ngIf="chapter.cursos.length > 0">
+            <div class="course-card" 
+                 *ngFor="let course of chapter.cursos; trackBy: trackByCourse"
+                 (click)="onViewCourse(course.idCurso)">
+              
+              <div class="course-header">
+                <div class="course-category" [style.background-color]="getProgressColor(course.nivel)">
+                  {{ course.categoria }}
+                </div>
+                <div class="course-level">
+                  <span class="level-badge" [style.color]="getProgressColor(course.nivel)">
+                    {{ course.nivel }}
+                  </span>
+                </div>
+              </div>
+
+              <div class="course-content">
+                <h4 class="course-title">{{ course.titulo }}</h4>
+                <p class="course-description" *ngIf="course.descripcion">
+                  {{ course.descripcion }}
+                </p>
+                <p class="course-no-description" *ngIf="!course.descripcion">
+                  Sin descripción disponible
+                </p>
+              </div>
+
+              <div class="course-footer">
+                <div class="course-progress">
+                  <div class="progress-bar">
+                    <div class="progress-fill" 
+                         [style.width.%]="getProgressPercentage()">
+                    </div>
+                  </div>
+                  <span class="progress-text">{{ getProgressPercentage() }}% completado</span>
+                </div>
+                
+                <div class="course-actions">
+                  <button class="btn-continue">
+                    Continuar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sin cursos -->
+          <div class="no-courses" *ngIf="chapter.cursos.length === 0">
+            <div class="no-courses-icon">📝</div>
+            <p class="no-courses-text">Este capítulo no tiene cursos asignados aún.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-container" *ngIf="!isLoading && !errorMessage && userChapters.length === 0">
+    <div class="empty-icon">📚</div>
+    <h3 class="empty-title">No tienes cursos asignados</h3>
+    <p class="empty-message">
+      Cuando se te asignen cursos, aparecerán aquí organizados por capítulos.
+    </p>
+    <button class="btn-refresh" (click)="onRefresh()">
+      <span class="btn-icon">🔄</span>
+      Verificar nuevamente
+    </button>
+  </div>
+</div>

@@ -5,7 +5,7 @@ import { AuthGuard } from './core/guards/auth.guard';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: '/dashboard',
+    redirectTo: '/auth/login',
     pathMatch: 'full'
   },
   {
@@ -40,9 +40,8 @@ const routes: Routes = [
     path: 'admin',
     loadChildren: () => import('./modules/admin/admin.module').then(m => m.AdminModule),
     canLoad: [AuthGuard],
-    canActivate: [AuthGuard]
-    // COMENTADO: Validación de roles deshabilitada para desarrollo
-    // data: { role: 'admin' }
+    canActivate: [AuthGuard],
+    data: { role: 'profesor' }
   },
   {
     path: '**',

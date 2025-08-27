@@ -19,55 +19,55 @@ export class SidebarComponent implements OnInit {
       label: 'Dashboard',
       icon: '📊',
       route: '/dashboard',
-      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT]
+      roles: [UserRole.PROFESOR, UserRole.ESTUDIANTE]
     },
     {
       label: 'Cursos',
       icon: '📚',
       route: '/courses',
-      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT]
+      roles: [UserRole.PROFESOR, UserRole.ESTUDIANTE]
     },
     {
       label: 'Mis Cursos',
       icon: '🎓',
-      route: '/my-courses',
-      roles: [UserRole.STUDENT]
+      route: '/courses/mis-cursos',
+      roles: [UserRole.ESTUDIANTE]
     },
     {
       label: 'Crear Curso',
       icon: '➕',
       route: '/courses/new',
-      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR]
+      roles: [UserRole.PROFESOR]
     },
     {
       label: 'Insignias',
       icon: '🏅',
       route: '/badges',
-      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT]
+      roles: [UserRole.PROFESOR, UserRole.ESTUDIANTE]
     },
     {
       label: 'Mi Perfil',
       icon: '👤',
       route: '/profile',
-      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT]
+      roles: [UserRole.PROFESOR, UserRole.ESTUDIANTE]
     },
     {
-      label: 'Usuarios',
+      label: 'Gestionar Estudiantes',
       icon: '👥',
-      route: '/admin/users',
-      roles: [UserRole.ADMIN]
+      route: '/manage/students',
+      roles: [UserRole.PROFESOR]
     },
     {
       label: 'Reportes',
       icon: '📈',
-      route: '/admin/reports',
-      roles: [UserRole.ADMIN]
+      route: '/reports',
+      roles: [UserRole.PROFESOR]
     },
     {
       label: 'Configuración',
       icon: '⚙️',
       route: '/settings',
-      roles: [UserRole.ADMIN, UserRole.INSTRUCTOR, UserRole.STUDENT]
+      roles: [UserRole.PROFESOR, UserRole.ESTUDIANTE]
     }
   ];
 

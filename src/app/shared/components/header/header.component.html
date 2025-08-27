@@ -87,10 +87,10 @@
       <!-- Usuario -->
       <div class="user-container" *ngIf="currentUser$ | async as user">
         <button class="user-btn" (click)="toggleUserMenu()">
-          <img [src]="user.profilePicture || 'https://i.pravatar.cc/40?img=1'" 
-               [alt]="user.firstName + ' ' + user.lastName" 
+          <img src="https://i.pravatar.cc/40?img=1" 
+               [alt]="user.nombre" 
                class="user-avatar">
-          <span class="user-name">{{ user.firstName }}</span>
+          <span class="user-name">{{ user.nombre }}</span>
           <svg class="chevron-icon" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/>
           </svg>
@@ -99,13 +99,13 @@
         <!-- Dropdown de Usuario -->
         <div class="user-dropdown" *ngIf="showUserMenu" @slideDown>
           <div class="user-info">
-            <img [src]="user.profilePicture || 'https://i.pravatar.cc/60?img=1'" 
-                 [alt]="user.firstName + ' ' + user.lastName" 
+            <img src="https://i.pravatar.cc/60?img=1" 
+                 [alt]="user.nombre" 
                  class="user-avatar-large">
             <div class="user-details">
-              <h3>{{ user.firstName }} {{ user.lastName }}</h3>
-              <p>{{ user.email }}</p>
-              <span class="user-role">{{ user.role | titlecase }}</span>
+              <h3>{{ user.nombre }}</h3>
+              <p>{{ user.correo }}</p>
+              <span class="user-role">{{ user.rol | titlecase }}</span>
             </div>
           </div>
           <div class="dropdown-menu">
